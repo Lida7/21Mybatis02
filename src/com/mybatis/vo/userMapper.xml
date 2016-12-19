@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.vo.User">
+	
+	<!-- 一对一嵌套结果 -->
+	<select id="selectUserById" parameterType="int" resultMap="selectUserMap">
+		SELECT user.id,userName,sex,teacher.id AS teacherId,teacherName FROM USER
+		LEFT OUTER JOIN Teacher ON Teacher.id = user.teacherId 
+		 where user.id = #{id}
+	</select>
+	<resultMap type="User" id="selectUserMap" autoMapping="true">
+		<!-- <id property="id" column="id"/>
+		<result property="userName" column="userName"/>
+		<result property="sex" column="sex"/> -->
+		<association property="teacher" javaType="Teacher" autoMapping="true">
+			<id column="teacherId" property="id"/>
+			<!-- <result column="teacherName" property="teacherName"/> -->
+		</association>
+	</resultMap>
+	
+	
+	
+	<!-- 一对一嵌套查询 -->
+	<select id="selectSingleUserById" parameterType="int" resultMap="selectSingleUserMap" >
+		select * from User where id = #{id}
+	</select>
+	<select id="selectSingleUser" parameterType="int" resultType="Teacher">
+		select * from Teacher where id = #{id}
+	</select>
+	<resultMap type="User" id="selectSingleUserMap" autoMapping="true">
+		<association javaType="Teacher" property="teacher" column="teacherId" select="selectSingleUser"  autoMapping="true"></association>
+	</resultMap>
+	
+	
+</mapper>

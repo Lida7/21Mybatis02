@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.vo.Teacher">
+
+	<!-- 嵌套结果 -->
+	<select id="getTeacherByJoin" parameterType="int" resultMap="getTeacherByJoinMap">
+		SELECT teacher.*,user.id AS userId,user.UserName,user.Sex FROM Teacher
+		LEFT OUTER JOIN USER ON user.TeacherID = teacher.id where teacher.id = #{id}
+	</select>
+	<resultMap type="Teacher" id="getTeacherByJoinMap" autoMapping="true">
+		<id column="id" property="id"/>
+		<collection property="users" ofType="User" autoMapping="true">
+			<id property="id" column="userId"/>
+		</collection>
+	</resultMap>
+	
+	
+
+	<!-- 一对多嵌套查询 -->
+	<select id="getTeacherById" parameterType="int" resultMap="getTeacherByIdMap">
+		select * from Teacher where id = #{id}
+	</select>
+	<select id="getUserByTeacherId" parameterType="int" resultType="User">
+		select * from User where teacherId = #{teacherId}
+	</select>
+	<resultMap type="Teacher" id="getTeacherByIdMap" autoMapping="true">
+		<id column="id" property="id"/>
+		<collection property="users" column="id"  select="getUserByTeacherId" autoMapping="true"></collection>
+	</resultMap>
+	
+</mapper>
